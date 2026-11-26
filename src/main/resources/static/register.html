@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Đăng ký</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f2f4f7; display: flex; justify-content: center; padding-top: 80px; }
+    .box { background: #fff; padding: 30px; border-radius: 8px; width: 320px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+    input { width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; }
+    button { width: 100%; padding: 10px; background: #2d7ff9; color: #fff; border: 0; border-radius: 4px; cursor: pointer; }
+    #msg { margin-top: 10px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Đăng ký</h2>
+    <input id="username" placeholder="Username">
+    <input id="email" type="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Mật khẩu (tối thiểu 6 ký tự)">
+    <button onclick="register()">Đăng ký</button>
+    <div id="msg"></div>
+    <p>Đã có tài khoản? <a href="login.html">Đăng nhập</a></p>
+  </div>
+
+  <script>
+    async function register() {
+      const msg = document.getElementById('msg');
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: document.getElementById('username').value,
+          email: document.getElementById('email').value,
+          password: document.getElementById('password').value
+        })
+      });
+      if (res.status === 201) {
+        msg.style.color = 'green';
+        msg.textContent = 'Đăng ký thành công! Đang chuyển sang trang đăng nhập...';
+        setTimeout(() => location.href = 'login.html', 1500);
+      } else if (res.status === 409) {
+        msg.style.color = 'red';
+        msg.textContent = (await res.json()).message;
+      } else {
+        msg.style.color = 'red';
+        msg.textContent = 'Dữ liệu không hợp lệ (username ≥ 3 ký tự, email đúng định dạng, mật khẩu ≥ 6 ký tự)';
+      }
+    }
+  </script>
+</body>
+</html>
